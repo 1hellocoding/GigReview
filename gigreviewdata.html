@@ -25,23 +25,16 @@
         }
         .new-review-animation { animation: pop-in 0.5s ease-out forwards; }
         
-        /* Custom Alert Styles */
         #customAlert {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
+            position: fixed; top: 20px; left: 50%;
+            transform: translateX(-50%); z-index: 9999;
             pointer-events: none;
         }
         .custom-alert-box {
             background: linear-gradient(135deg, #3b82f6, #6366f1);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 0.75rem;
+            color: white; padding: 1rem 1.5rem; border-radius: 0.75rem;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            font-weight: 500;
-            opacity: 0;
+            font-weight: 500; opacity: 0;
             animation: slideDownFadeIn 0.4s ease-out forwards;
         }
         .custom-alert-box.fade-out {
@@ -174,18 +167,17 @@
         </div>
         <div class="mt-16">
             <h2 class="text-3xl font-bold text-slate-900 border-b border-slate-200 pb-4">Recent Reviews</h2>
-            <div id="reviews-container" class="mt-8 space-y-6">
-                <div id="no-reviews-message" class="text-center py-12 px-6 bg-white rounded-xl border border-slate-200">
-                    <p class="text-slate-500">Loading reviews...</p>
-                </div>
+            <div id="no-reviews-message" class="text-center py-12 px-6 bg-white rounded-xl border border-slate-200 mt-8">
+                <p class="text-slate-500">Loading reviews...</p>
             </div>
+            <div id="reviews-container" class="mt-8 space-y-6">
+                </div>
         </div>
         <div id="loadingOverlay"><p>Loading Events...</p></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const REVIEW_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRaeCIG4k0nRJAk-IQJRWr9OzkaKEVEWon5mdULnGEPhhW1AHzVo4oXB6eEuGvRRVSglpWg4em18Ri0/pub?gid=1554482653&single=true&output=csv";
             const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxtluWbkgxMdlM0aTK7JOM_CRQBbB-orWas5ywJE6m9eASz0EgMfGgq7W2XWeip0rwKNQ/exec";
             const GIG_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRaeCIG4k0nRJAk-IQJRWr9OzkaKEVEWon5mdULnGEPhhW1AHzVo4oXB6eEuGvRRVSglpWg4em18Ri0/pub?gid=1813652457&single=true&output=csv";
             
@@ -338,15 +330,15 @@
                 fetch(APPS_SCRIPT_URL, { method: 'POST', body: formData })
                     .then(res => res.json())
                     .then(data => {
-                        console.log(data);
                         reviewForm.reset();
                         currentRating = 0; highlightStars(0); selectedGig = null;
                         updateSelectedGigDisplay(); updateCharCount();
-                        showCustomAlert('Review submitted! It may take a minute to appear.');
+                        showCustomAlert('Review submitted successfully!');
+                        loadReviews();
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        showCustomAlert('There was an error submitting your review.');
+                        showCustomAlert('Error submitting review.');
                     })
                     .finally(() => {
                         submitButton.disabled = false;
@@ -382,31 +374,38 @@
             };
 
             const loadReviews = () => {
-                Papa.parse(REVIEW_CSV_URL, {
-                    download: true,
-                    header: true,
-                    cache: false, // Prevent caching to get fresh data
-                    complete: (results) => {
+                fetch(APPS_SCRIPT_URL)
+                    .then(res => res.json())
+                    .then(data => {
+                        // Check if the script returned an error
+                        if (data.error) {
+                            throw new Error(data.error);
+                        }
+
                         reviewsContainer.innerHTML = '';
-                        if (!results.data || results.data.length === 0) {
-                            noReviewsMessage.style.display = 'block';
-                            reviewsContainer.appendChild(noReviewsMessage);
+                        
+                        if (!data || data.length === 0) {
+                            reviewsContainer.style.display = 'none'; // Hide container
+                            noReviewsMessage.style.display = 'block'; // Show message
+                            noReviewsMessage.querySelector('p').textContent = 'Be the first to share your thoughts!';
                             return;
                         }
-                        noReviewsMessage.style.display = 'none';
-                        results.data.reverse().forEach(review => {
-                            if (review.name && review.createdAt) { // Ensure row is not empty
+                        
+                        reviewsContainer.style.display = 'block'; // Show container
+                        noReviewsMessage.style.display = 'none'; // Hide message
+                        data.reverse().forEach(review => {
+                            if (review.name) {
                                 const reviewCardHTML = createReviewCard(review);
                                 reviewsContainer.insertAdjacentHTML('beforeend', reviewCardHTML);
                             }
                         });
-                    },
-                    error: (err) => {
+                    })
+                    .catch(err => {
                         console.error("Error loading reviews:", err);
-                        noReviewsMessage.textContent = 'Could not load reviews.';
+                        reviewsContainer.style.display = 'none';
                         noReviewsMessage.style.display = 'block';
-                    }
-                });
+                        noReviewsMessage.querySelector('p').textContent = 'Could not load reviews.';
+                    });
             };
 
             const updateCharCount = () => {
@@ -435,7 +434,6 @@
                     }
                 });
                 loadReviews();
-                setInterval(loadReviews, 30000); // Refresh every 30 seconds
                 updateCharCount();
             };
 
