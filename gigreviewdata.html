@@ -65,21 +65,45 @@
             padding: 0 8px; transition: color 0.2s;
         }
         .calendar-header button:hover { color: #3730a3; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
         .calendar-grid .day-label {
             text-align: center; font-size: 0.75em; font-weight: bold; color: #64748b;
         }
+        
+        /* --- FINAL RESPONSIVE FIX --- */
         .day {
-            background: #f1f5f9; color: #334155; width: 36px;
-            height: 36px; border-radius: 50%; cursor: pointer;
-            font-size: 0.8em; transition: all 0.2s ease; display: flex;
-            align-items: center; justify-content: center;
+            /* Make it a circle that fills its container */
+            aspect-ratio: 1 / 1;
+            width: 100%;
+            
+            /* Prevent the day from getting bigger than 36px */
+            max-width: 36px;
+            
+            /* Center the day within its grid cell */
+            margin: 0 auto;
+
+            background: #f1f5f9;
+            color: #334155;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+        
         .day:hover { background: #e0e7ff; color: #3730a3; transform: scale(1.05); }
         .day.selected {
             background: linear-gradient(135deg, #4f46e5, #6366f1); color: white;
             font-weight: bold; box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4);
-            transform: scale(1.1);
+            /* Reduced scale to prevent clipping on selection */
+            transform: scale(1.05);
         }
         .day.today { border: 2px solid #4f46e5; }
         .day.has-events { font-weight: bold; color: #3730a3; }
