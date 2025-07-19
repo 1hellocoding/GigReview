@@ -347,6 +347,8 @@
                 formData.append('gigName', selectedGig.name);
                 formData.append('gigVenue', selectedGig.venue);
                 formData.append('eventDate', selectedGig.date);
+                // Add the Approval field, defaulting to FALSE
+                formData.append('Approval', 'FALSE'); 
 
                 fetch(APPS_SCRIPT_URL, { method: 'POST', body: formData })
                     .then(res => res.json())
@@ -354,7 +356,7 @@
                         reviewForm.reset();
                         currentRating = 0; highlightStars(0); selectedGig = null;
                         updateSelectedGigDisplay(); updateCharCount();
-                        showCustomAlert('Review submitted successfully!');
+                        showCustomAlert('Review submitted successfully! It will appear after approval.'); // Update message
                         loadReviews();
                     })
                     .catch(error => {
@@ -405,16 +407,19 @@
 
                         reviewsContainer.innerHTML = '';
                         
-                        if (!data || data.length === 0) {
+                        // Filter reviews: only show if 'Approval' is true (or a truthy value like 'TRUE')
+                        const approvedReviews = data.filter(review => review.Approval === 'TRUE' || review.Approval === true);
+
+                        if (!approvedReviews || approvedReviews.length === 0) {
                             reviewsContainer.style.display = 'none';
                             noReviewsMessage.style.display = 'block';
-                            noReviewsMessage.querySelector('p').textContent = 'Be the first to share your thoughts!';
+                            noReviewsMessage.querySelector('p').textContent = 'No reviews yet. Be the first to share your thoughts!';
                             return;
                         }
                         
                         reviewsContainer.style.display = 'block';
                         noReviewsMessage.style.display = 'none';
-                        data.reverse().forEach(review => {
+                        approvedReviews.reverse().forEach(review => {
                             if (review.name) {
                                 const reviewCardHTML = createReviewCard(review);
                                 reviewsContainer.insertAdjacentHTML('beforeend', reviewCardHTML);
