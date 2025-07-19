@@ -75,18 +75,11 @@
             text-align: center; font-size: 0.75em; font-weight: bold; color: #64748b;
         }
         
-        /* --- FINAL RESPONSIVE FIX --- */
         .day {
-            /* Make it a circle that fills its container */
             aspect-ratio: 1 / 1;
             width: 100%;
-            
-            /* Prevent the day from getting bigger than 36px */
             max-width: 36px;
-            
-            /* Center the day within its grid cell */
             margin: 0 auto;
-
             background: #f1f5f9;
             color: #334155;
             border-radius: 50%;
@@ -102,7 +95,6 @@
         .day.selected {
             background: linear-gradient(135deg, #4f46e5, #6366f1); color: white;
             font-weight: bold; box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4);
-            /* Reduced scale to prevent clipping on selection */
             transform: scale(1.05);
         }
         .day.today { border: 2px solid #4f46e5; }
@@ -169,6 +161,10 @@
                         <input type="text" id="reviewer-name" required maxlength="30" class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
                     </div>
                     <div class="space-y-2 mb-6">
+                        <label for="reviewer-hometown" class="text-sm font-medium text-slate-700">Hometown</label>
+                        <input type="text" id="reviewer-hometown" required maxlength="50" class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                    </div>
+                    <div class="space-y-2 mb-6">
                         <label class="text-sm font-medium text-slate-700">Your Rating</label>
                         <div id="submit-rating" class="flex items-center space-x-2 text-2xl text-slate-300">
                             <i class="fa-regular fa-star cursor-pointer transition-transform hover:scale-125" data-value="1"></i>
@@ -202,7 +198,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxtluWbkgxMdlM0aTK7JOM_CRQBbB-orWas5ywJE6m9eASz0EgMfGgq7W2XWeip0rwKNQ/exec";
+            const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxE7XcfdMcnLhoVmLhzBqmQIr6iFBKfIgrO2pl0RMCHdv_4SOV3T4vQ28p-ie8vnzWFYg/exec";
             const GIG_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRaeCIG4k0nRJAk-IQJRWr9OzkaKEVEWon5mdULnGEPhhW1AHzVo4oXB6eEuGvRRVSglpWg4em18Ri0/pub?gid=1813652457&single=true&output=csv";
             
             let allEvents = [], eventDates = new Set(), currentYear, currentMonth;
@@ -335,7 +331,7 @@
 
             reviewForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                if (!selectedGig || currentRating === 0 || !reviewTextarea.value.trim() || !document.getElementById('reviewer-name').value.trim()) {
+                if (!selectedGig || currentRating === 0 || !reviewTextarea.value.trim() || !document.getElementById('reviewer-name').value.trim() || !document.getElementById('reviewer-hometown').value.trim()) {
                     showCustomAlert('Please fill out all fields and select a gig/rating.');
                     return;
                 }
@@ -345,6 +341,7 @@
 
                 const formData = new FormData();
                 formData.append('name', document.getElementById('reviewer-name').value.trim());
+                formData.append('hometown', document.getElementById('reviewer-hometown').value.trim());
                 formData.append('reviewText', reviewTextarea.value.trim());
                 formData.append('rating', currentRating);
                 formData.append('gigName', selectedGig.name);
@@ -385,6 +382,7 @@
                                 <div class="flex justify-between items-center gap-4">
                                     <div class="min-w-0">
                                         <h3 class="font-semibold text-slate-900 truncate">${review.name}</h3>
+                                        <p class="text-sm text-slate-500">From: <span class="font-medium">${review.Hometown || 'N/A'}</span></p>
                                         <p class="text-sm text-slate-500">Reviewed: <span class="font-medium">${review.gigName} at ${review.gigVenue}</span></p>
                                         <p class="text-sm text-slate-500">Event Date: <span class="font-medium">${eventDate}</span></p>
                                     </div>
@@ -401,7 +399,6 @@
                 fetch(APPS_SCRIPT_URL)
                     .then(res => res.json())
                     .then(data => {
-                        // Check if the script returned an error
                         if (data.error) {
                             throw new Error(data.error);
                         }
@@ -409,14 +406,14 @@
                         reviewsContainer.innerHTML = '';
                         
                         if (!data || data.length === 0) {
-                            reviewsContainer.style.display = 'none'; // Hide container
-                            noReviewsMessage.style.display = 'block'; // Show message
+                            reviewsContainer.style.display = 'none';
+                            noReviewsMessage.style.display = 'block';
                             noReviewsMessage.querySelector('p').textContent = 'Be the first to share your thoughts!';
                             return;
                         }
                         
-                        reviewsContainer.style.display = 'block'; // Show container
-                        noReviewsMessage.style.display = 'none'; // Hide message
+                        reviewsContainer.style.display = 'block';
+                        noReviewsMessage.style.display = 'none';
                         data.reverse().forEach(review => {
                             if (review.name) {
                                 const reviewCardHTML = createReviewCard(review);
