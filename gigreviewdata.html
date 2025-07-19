@@ -176,8 +176,8 @@
                     </div>
                     <div class="space-y-2 mb-6" id="review-text-container">
                         <label for="review-text" class="text-sm font-medium text-slate-700">Your Review</label>
-                        <textarea id="review-text" rows="4" required maxlength="60" class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow resize-none"></textarea>
-                        <div id="review-char-count">60</div>
+                        <textarea id="review-text" rows="4" required maxlength="120" class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow resize-none"></textarea>
+                        <div id="review-char-count">120</div>
                     </div>
                     <button type="submit" class="w-full py-3 px-5 bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition-all transform hover:scale-105">
                         Submit Review
@@ -198,7 +198,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxE7XcfdMcnLhoVmLhzBqmQIr6iFBKfIgrO2pl0RMCHdv_4SOV3T4vQ28p-ie8vnzWFYg/exec";
+            const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8jAymjoXDbYNN98tz2Q6uK6koLzmy5Jqw1z6BRR136iM7mMpFJKmeuRPcrF5fV9piMg/exec";
             const GIG_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRaeCIG4k0nRJAk-IQJRWr9OzkaKEVEWon5mdULnGEPhhW1AHzVo4oXB6eEuGvRRVSglpWg4em18Ri0/pub?gid=1813652457&single=true&output=csv";
             
             let allEvents = [], eventDates = new Set(), currentYear, currentMonth;
@@ -347,8 +347,6 @@
                 formData.append('gigName', selectedGig.name);
                 formData.append('gigVenue', selectedGig.venue);
                 formData.append('eventDate', selectedGig.date);
-                // Add the Approval field, defaulting to FALSE
-                formData.append('Approval', 'FALSE'); 
 
                 fetch(APPS_SCRIPT_URL, { method: 'POST', body: formData })
                     .then(res => res.json())
@@ -356,7 +354,7 @@
                         reviewForm.reset();
                         currentRating = 0; highlightStars(0); selectedGig = null;
                         updateSelectedGigDisplay(); updateCharCount();
-                        showCustomAlert('Review submitted successfully! It will appear after approval.'); // Update message
+                        showCustomAlert('Review submitted successfully!');
                         loadReviews();
                     })
                     .catch(error => {
@@ -377,24 +375,24 @@
                 const starsHTML = Array(5).fill(0).map((_, i) => `<i class="fa-solid fa-star ${i < review.rating ? 'text-amber-400' : 'text-slate-300'}"></i>`).join('');
 
                 return `
-                    <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200 break-words">
-                        <div class="flex items-start space-x-4">
-                            <div class="flex-shrink-0 w-12 h-12 bg-indigo-500 text-white text-xl font-bold rounded-full flex items-center justify-center">${initial}</div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex justify-between items-center gap-4">
-                                    <div class="min-w-0">
-                                        <h3 class="font-semibold text-slate-900 truncate">${review.name}</h3>
-                                        <p class="text-sm text-slate-500">From: <span class="font-medium">${review.Hometown || 'N/A'}</span></p>
-                                        <p class="text-sm text-slate-500">Reviewed: <span class="font-medium">${review.gigName} at ${review.gigVenue}</span></p>
-                                        <p class="text-sm text-slate-500">Event Date: <span class="font-medium">${eventDate}</span></p>
+                        <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200 break-words">
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0 w-12 h-12 bg-indigo-500 text-white text-xl font-bold rounded-full flex items-center justify-center">${initial}</div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex justify-between items-center gap-4">
+                                        <div class="min-w-0">
+                                            <h3 class="font-semibold text-slate-900 truncate">${review.name}</h3>
+                                            <p class="text-sm text-slate-500">From: <span class="font-medium">${review.hometown || 'N/A'}</span></p>
+                                            <p class="text-sm text-slate-500">Reviewed: <span class="font-medium">${review.gigName} at ${review.gigVenue}</span></p>
+                                            <p class="text-sm text-slate-500">Event Date: <span class="font-medium">${eventDate}</span></p>
+                                        </div>
+                                        <div class="flex-shrink-0 flex items-center space-x-1 text-lg">${starsHTML}</div>
                                     </div>
-                                    <div class="flex-shrink-0 flex items-center space-x-1 text-lg">${starsHTML}</div>
+                                    <p class="mt-4 text-slate-700 break-words">${review.reviewText}</p>
+                                    <p class="text-right text-xs text-slate-400 mt-4">Reviewed on: ${reviewDate}</p>
                                 </div>
-                                <p class="mt-4 text-slate-700 break-words">${review.reviewText}</p>
-                                <p class="text-right text-xs text-slate-400 mt-4">Reviewed on: ${reviewDate}</p>
                             </div>
-                        </div>
-                    </div>`;
+                        </div>`;
             };
 
             const loadReviews = () => {
@@ -407,19 +405,16 @@
 
                         reviewsContainer.innerHTML = '';
                         
-                        // Filter reviews: only show if 'Approval' is true (or a truthy value like 'TRUE')
-                        const approvedReviews = data.filter(review => review.Approval === 'TRUE' || review.Approval === true);
-
-                        if (!approvedReviews || approvedReviews.length === 0) {
+                        if (!data || data.length === 0) {
                             reviewsContainer.style.display = 'none';
                             noReviewsMessage.style.display = 'block';
-                            noReviewsMessage.querySelector('p').textContent = 'No reviews yet. Be the first to share your thoughts!';
+                            noReviewsMessage.querySelector('p').textContent = 'Be the first to share your thoughts!';
                             return;
                         }
                         
                         reviewsContainer.style.display = 'block';
                         noReviewsMessage.style.display = 'none';
-                        approvedReviews.reverse().forEach(review => {
+                        data.reverse().forEach(review => {
                             if (review.name) {
                                 const reviewCardHTML = createReviewCard(review);
                                 reviewsContainer.insertAdjacentHTML('beforeend', reviewCardHTML);
@@ -435,7 +430,7 @@
             };
 
             const updateCharCount = () => {
-                charCountDisplay.textContent = 60 - reviewTextarea.value.length;
+                charCountDisplay.textContent = 120 - reviewTextarea.value.length;
             };
             reviewTextarea.addEventListener('input', updateCharCount);
             
