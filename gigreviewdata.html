@@ -200,8 +200,8 @@
                     </div>
                     <div class="space-y-2 mb-6" id="review-text-container">
                         <label for="review-text" class="text-sm font-medium text-slate-700">Your Review</label>
-                        <textarea id="review-text" rows="4" required maxlength="120" class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow resize-none"></textarea>
-                        <div id="review-char-count">120</div>
+                        <textarea id="review-text" rows="4" required maxlength="60" class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow resize-none"></textarea>
+                        <div id="review-char-count">60</div>
                     </div>
                     <button type="submit" class="w-full py-3 px-5 bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition-all transform hover:scale-105">
                         Submit Review
@@ -462,7 +462,7 @@
             };
 
             const updateCharCount = () => {
-                charCountDisplay.textContent = 120 - reviewTextarea.value.length;
+                charCountDisplay.textContent = 60 - reviewTextarea.value.length;
             };
             reviewTextarea.addEventListener('input', updateCharCount);
             
