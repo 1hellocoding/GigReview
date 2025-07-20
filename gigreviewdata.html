@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Reviews | Tailwind CSS</title>
+    <title>Reviews | Tailwind CSS</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -136,9 +136,26 @@
 </head>
 <body class="bg-slate-50 text-slate-800">
 
+    <div class="w-full flex justify-center pt-8 pb-12">
+        <a
+            href="https://mybandstonight.com/home"
+            target="_top"
+            class="group flex items-center justify-center bg-white hover:bg-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-blue-300">
+            <svg
+                class="w-5 h-5 mr-3 transition-transform duration-300 ease-in-out group-hover:-translate-x-1"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>Back</span>
+        </a>
+    </div>
+
     <div id="customAlert"></div>
 
-    <div class="container mx-auto max-w-6xl px-4 py-12">
+    <div class="container mx-auto max-w-6xl px-4 pb-12">
         <header class="text-center mb-12">
             <h1 class="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">Leave a Band Review</h1>
             <p class="mt-4 text-lg text-slate-600">Select a date, pick a gig, and share your experience.</p>
@@ -390,24 +407,24 @@
                 const starsHTML = Array(5).fill(0).map((_, i) => `<i class="fa-solid fa-star ${i < review.rating ? 'text-amber-400' : 'text-slate-300'}"></i>`).join('');
 
                 return `
-                        <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200 break-words">
-                            <div class="flex items-start space-x-4">
-                                <div class="flex-shrink-0 w-12 h-12 bg-indigo-500 text-white text-xl font-bold rounded-full flex items-center justify-center">${initial}</div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex justify-between items-center gap-4">
-                                        <div class="min-w-0">
-                                            <h3 class="font-semibold text-slate-900 truncate">${review.name}</h3>
-                                            <p class="text-sm text-slate-500">From: <span class="font-medium">${review.hometown || 'N/A'}</span></p>
-                                            <p class="text-sm text-slate-500">Reviewed: <span class="font-medium">${review.gigName} at ${review.gigVenue}</span></p>
-                                            <p class="text-sm text-slate-500">Event Date: <span class="font-medium">${eventDate}</span></p>
+                            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200 break-words">
+                                <div class="flex items-start space-x-4">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-indigo-500 text-white text-xl font-bold rounded-full flex items-center justify-center">${initial}</div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-center gap-4">
+                                            <div class="min-w-0">
+                                                <h3 class="font-semibold text-slate-900 truncate">${review.name}</h3>
+                                                <p class="text-sm text-slate-500">From: <span class="font-medium">${review.hometown || 'N/A'}</span></p>
+                                                <p class="text-sm text-slate-500">Reviewed: <span class="font-medium">${review.gigName} at ${review.gigVenue}</span></p>
+                                                <p class="text-sm text-slate-500">Event Date: <span class="font-medium">${eventDate}</span></p>
+                                            </div>
+                                            <div class="flex-shrink-0 flex items-center space-x-1 text-lg">${starsHTML}</div>
                                         </div>
-                                        <div class="flex-shrink-0 flex items-center space-x-1 text-lg">${starsHTML}</div>
+                                        <p class="mt-4 text-slate-700 break-words">${review.reviewText}</p>
+                                        <p class="text-right text-xs text-slate-400 mt-4">Reviewed on: ${reviewDate}</p>
                                     </div>
-                                    <p class="mt-4 text-slate-700 break-words">${review.reviewText}</p>
-                                    <p class="text-right text-xs text-slate-400 mt-4">Reviewed on: ${reviewDate}</p>
                                 </div>
-                            </div>
-                        </div>`;
+                            </div>`;
             };
 
             const loadReviews = () => {
