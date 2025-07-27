@@ -623,10 +623,18 @@
                             name: row["Name"] || "", date: normalizeDate(row["Date"]), venue: row["Venue Name"] || row["Venue"] || "",
                         })).filter(e => e.date && e.name);
                         allEvents.forEach(e => eventDates.add(e.date));
+
                         const today = new Date();
-                        currentYear = today.getFullYear(); currentMonth = today.getMonth();
+                        currentYear = today.getFullYear();
+                        currentMonth = today.getMonth();
+                        
+                        // Set selectedDate to today's date
+                        selectedDate = normalizeDate(today);
+
                         buildCalendar(currentYear, currentMonth);
                         setupCalendarNavigation();
+                        // Load gigs for the pre-selected today's date
+                        loadGigsForDate(selectedDate);
                         // Fade out loading overlay once data is loaded
                         loadingOverlay.style.opacity = '0';
                         setTimeout(() => {
